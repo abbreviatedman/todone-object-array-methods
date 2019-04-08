@@ -8,7 +8,6 @@ For example, isDone[3] would hold the "done-ness" information for todos[3].
 */
 
 let todos = [];
-let isDone = [];
 
 // When the html finishes loading, launch `init`.
 window.onload = init;
@@ -35,18 +34,22 @@ function addTodo(event) {
     event.preventDefault();
 
     // Get new todo from the new todo input field.
-    const newTodo = document.querySelector('#new-todo').value;
+    const todoText = document.querySelector('#new-todo').value;
+
+    const newTodo = {
+        text: todoText,
+        isDone: false,
+    }
 
     // Clear the input field of all text.
     document.querySelector('#new-todo').value = '';
 
     // Put the todo and its "done-ness" in their respective arrays.
     todos.push(newTodo);
-    isDone.push(false);
 
     // Create a new html element and put our new todo's text in there.
     const newLi = document.createElement('li');
-    newLi.innerText = newTodo;
+    newLi.innerText = newTodo.text;
     
     // Add an event listener on the newly created html element to launch
     // `toggleDone` when it's clicked.
@@ -64,7 +67,6 @@ function clearAllTodos(event) {
     
     // Remove all todos from BOTH arrays.
     todos.splice(0);
-    isDone.splice(0);
     
     // Remove all todos from the html.
     removeAllChildrenOfOl();
@@ -86,18 +88,14 @@ function clearDoneTodos(event) {
     */
 
     const notDone = [];
-    const newIsDone = [];
 
     for(let i = 0; i < todos.length; i++) {
-        if(!isDone[i]) {
+        if(todos[i].isDone === false) {
             notDone.push(todos[i]);
-            // isDone.splice(i, 1);
-            newIsDone.push(false);
         }
     }
 
     todos = notDone;
-    isDone = newIsDone;
 
     /*
         Now remove the done todos from the html.
@@ -114,9 +112,11 @@ function clearDoneTodos(event) {
 
     removeAllChildrenOfOl();
 
+
     for(let i = 0; i < todos.length; i++) {
+
         const newLi = document.createElement('li');
-        newLi.innerText = todos[i];
+        newLi.innerText = todos[i].text;
 
         newLi.addEventListener('click', toggleDone);
 
@@ -132,29 +132,20 @@ function toggleDone(event) {
     // Grab the HTML element that was clicked.
     // If you don't know, the event parameter has what you need... somewhere.
     const li = event.target;
-
-    // Find the index of the array that this todo resides in. There are a couple
-    // ways to do this, and I'm sure you'll figure one out!
-
     const ol = document.querySelector('#todo-list');
-    const lis = ol.childNodes;
-    let liIndex = -1;
-    
-    for(let i = 0; i < lis.length; i++) {
-        if(lis[i].innerText === li.innerText) {
-            liIndex = i;
-        }
-    }
+    const lis = Array.from(ol.childNodes);
+    const index = lis.indexOf(li);
+    const todo = todos[index];
 
     // *IF* it's not done yet, apply strikethrough. Otherwise, take it away!
-    if(isDone[liIndex]) {
+    if(todo.isDone) {
         li.style.textDecoration = '';
     } else {
         li.style.textDecoration = 'line-through';
     }
 
     // Toggle the "done-ness" of the same todo, using the isDone array.
-    isDone[liIndex] = !isDone[liIndex];
+    todo.isDone = !todo.isDone;
 }
 
 function removeAllChildrenOfOl() {
@@ -167,6 +158,6 @@ function removeAllChildrenOfOl() {
     // Look at the methods `.hasChildNodes` and `removeChild`.
     // There are other ways too, though. Feel free to poke around.
     while(ol.hasChildNodes()) {
-        ol.removeChild(ol.firstChild);
+        ol.firstChild.remove();
     }
 }
