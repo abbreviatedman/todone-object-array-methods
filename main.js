@@ -9,6 +9,7 @@ For example, isDone[3] would hold the "done-ness" information for todos[3].
 
 let todos = [];
 
+
 // When the html finishes loading, launch `init`.
 window.onload = init;
 
@@ -87,15 +88,12 @@ function clearDoneTodos(event) {
 
     */
 
-    const notDone = [];
-
-    for(let i = 0; i < todos.length; i++) {
-        if(todos[i].isDone === false) {
-            notDone.push(todos[i]);
-        }
+   
+   function isNotCompleted(todo) {
+       return todo.isDone === false
     }
-
-    todos = notDone;
+    
+    todos = todos.filter(isNotCompleted);
 
     /*
         Now remove the done todos from the html.
@@ -112,17 +110,17 @@ function clearDoneTodos(event) {
 
     removeAllChildrenOfOl();
 
-
-    for(let i = 0; i < todos.length; i++) {
-
+    function addTodoToPage(todo) {
         const newLi = document.createElement('li');
-        newLi.innerText = todos[i].text;
+        newLi.innerText = todo.text;
 
         newLi.addEventListener('click', toggleDone);
 
         const ol = document.querySelector('#todo-list');
         ol.appendChild(newLi);
     }
+
+    todos.forEach(addTodoToPage);
 }
 
 function toggleDone(event) {
